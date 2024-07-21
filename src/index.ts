@@ -11,19 +11,24 @@ const s3 = new S3({
 
 const app = express();
 
+
+// getting the reqeust from the user 
 app.get("/*", async (req, res) => {
   const host = req.hostname;
 
   const id = host.split(".")[0];
   const filePath = req.path;
 
+
+  // fetching content from aws
   const contents = await s3
     .getObject({
-      Bucket: "vercel",
+      Bucket: "cloud",
       Key: `dist/${id}${filePath}`,
     })
     .promise();
 
+  
   const type = filePath.endsWith("html")
     ? "text/html"
     : filePath.endsWith("css")
@@ -31,6 +36,8 @@ app.get("/*", async (req, res) => {
     : "application/javascript";
   res.set("Content-Type", type);
 
+
+  // sending back the reponse to the user for the website:
   res.send(contents.Body);
 });
 
